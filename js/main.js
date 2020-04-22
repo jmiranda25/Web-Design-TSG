@@ -8,17 +8,17 @@
 
 /*  CONTENTS
     ---------------------------
-    1. Loading / Opening
+    1. Iniciando / Abriendo
     2. FullPage init
-    3. Animate scroll fade adding
-    4. Menu button
-    5. Transition for nav & logo position
-    6. Text rotator on loading screen
+    3. Deslizamineto animado fade adding
+    4. Menu Botones
+    5. Transiciones para nav & posicionamiento de logo
+    6. Rotador de Texto on Inicio de pantalla
     7. Newsletter init
 */
 
 /* ------------------------------------- */
-/* 1. Loading / Opening ................ */
+/* 1. Iniciando / Abriendo ................ */
 /* ------------------------------------- */
 
 $(window).on('load', function () {
@@ -60,7 +60,7 @@ $(document).ready(function(){
     $('#fullpage').fullpage();
 
     /* ------------------------------------- */
-    /* 3. Works carousel ................... */
+    /* 3. Trabajos carousel ................... */
     /* ------------------------------------- */
 
     $('.works_slider').slick({
@@ -78,7 +78,7 @@ $(document).ready(function(){
     });
 
     /* ------------------------------------- */
-    /* 4. Services carousel ................ */
+    /* 4. Servicios carousel ................ */
     /* ------------------------------------- */
 
     $("#myCarousel").on("touchstart", function(event){
@@ -100,7 +100,7 @@ $(document).ready(function(){
     });
 
     /* ------------------------------------- */
-    /* 5. Newsletter block ................. */
+    /* 5. Bloque de Boletin informativo ................. */
     /* ------------------------------------- */
        
     var $button = $('#button-newsletter');
@@ -155,7 +155,7 @@ $(document).ready(function(){
     });
 
     /* ------------------------------------- */
-    /* 6. Menu hamburger animation ......... */
+    /* 6. Menu hamburger animacion ......... */
     /* ------------------------------------- */
 
     var btnEl = document.getElementsByClassName('navbar-toggler');
@@ -170,7 +170,7 @@ $(document).ready(function(){
     });
 
     /* ------------------------------------- */
-    /* 7. Forms ............................ */
+    /* 7. Formularios ............................ */
     /* ------------------------------------- */
 
     $("#contact-form").on('submit', function(e){

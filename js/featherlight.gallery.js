@@ -1,8 +1,8 @@
 /**
  * Featherlight Gallery – an extension for the ultra slim jQuery lightbox
- * Version 1.7.12 - http://noelboss.github.io/featherlight/
+ * Version 1.7.13 - http://noelboss.github.io/featherlight/
  *
- * Copyright 2017, Noël Raoul Bossart (http://www.noelboss.com)
+ * Copyright 2018, Noël Raoul Bossart (http://www.noelboss.com)
  * MIT Licensed.
 **/
 (function($) {
@@ -106,8 +106,8 @@
 
 	$.extend(FeatherlightGallery.prototype, {
 		/** Additional settings for Gallery **/
-		previousIcon: '<i class="ion-ios-arrow-thin-left"></i>',     /* Code that is used as previous icon */
-		nextIcon: '<i class="ion-ios-arrow-thin-right"></i>',         /* Code that is used as next icon */
+		previousIcon: '&#9664;',     /* Code that is used as previous icon */
+		nextIcon: '&#9654;',         /* Code that is used as next icon */
 		galleryFadeIn: 100,          /* fadeIn speed when image is loaded */
 		galleryFadeOut: 300,         /* fadeOut speed before image is loaded */
 

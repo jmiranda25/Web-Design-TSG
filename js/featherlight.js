@@ -1,8 +1,8 @@
 /**
  * Featherlight - ultra slim jQuery lightbox
- * Version 1.7.12 - http://noelboss.github.io/featherlight/
+ * Version 1.7.13 - http://noelboss.github.io/featherlight/
  *
- * Copyright 2017, Noël Raoul Bossart (http://www.noelboss.com)
+ * Copyright 2018, Noël Raoul Bossart (http://www.noelboss.com)
  * MIT Licensed.
 **/
 (function($) {
@@ -71,8 +71,9 @@
 
 	// NOTE: List of available [iframe attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe).
 	var iFrameAttributeSet = {
-		allowfullscreen: 1, frameborder: 1, height: 1, longdesc: 1, marginheight: 1, marginwidth: 1,
-		name: 1, referrerpolicy: 1, scrolling: 1, sandbox: 1, src: 1, srcdoc: 1, width: 1
+		allow: 1, allowfullscreen: 1, frameborder: 1, height: 1, longdesc: 1, marginheight: 1, marginwidth: 1,
+		mozallowfullscreen: 1, name: 1, referrerpolicy: 1, sandbox: 1, scrolling: 1, src: 1, srcdoc: 1, style: 1,
+		webkitallowfullscreen: 1, width: 1
 	};
 
 	// Converts camelCased attributes to dasherized versions for given prefix:
@@ -128,33 +129,16 @@
 		closeSpeed:     250,                   /* Duration of closing animation */
 		closeOnClick:   'background',          /* Close lightbox on click ('background', 'anywhere' or false) */
 		closeOnEsc:     true,                  /* Close lightbox when pressing esc */
-		closeIcon:      '<i class="icon ion-ios-close-empty"></i>',            /* Close icon */
+		closeIcon:      '&#10005;',            /* Close icon */
 		loading:        '',                    /* Content to show while initial content is loading */
 		persist:        false,                 /* If set, the content will persist and will be shown again when opened again. 'shared' is a special value when binding multiple elements for them to share the same content */
 		otherClose:     null,                  /* Selector for alternate close buttons (e.g. "a.close") */
 		beforeOpen:     $.noop,                /* Called before open. can return false to prevent opening of lightbox. Gets event as parameter, this contains all data */
 		beforeContent:  $.noop,                /* Called when content is loaded. Gets event as parameter, this contains all data */
 		beforeClose:    $.noop,                /* Called before close. can return false to prevent opening of lightbox. Gets event as parameter, this contains all data */
-
-		afterOpen:      function(event){
-			$.fn.fullpage.setAllowScrolling(false);
-			$.fn.fullpage.setKeyboardScrolling(false);
-			$("body").addClass("modal-open");
-		}, /* Called after open. Gets event as parameter, this contains all data */
-
-		afterContent:   function(event){
-			var title = this.$currentTarget.attr('data-title');
-			var text = this.$currentTarget.attr('data-text');
-			this.$instance.find('.caption').remove();
-			$('<div class="caption">').html('<h4 class="title-gallery">' + title + '</h4><p class="text-gallery">' + text + '</p>').appendTo(this.$instance.find('.featherlight-content'));
-		}, /* Called after content is ready and has been set. Gets event as parameter, this contains all data */
-
-		afterClose:     function(event){
-			$.fn.fullpage.setAllowScrolling(true);
-			$.fn.fullpage.setKeyboardScrolling(true);
-			$("body").removeClass("modal-open");
-		}, /* Called after close. Gets event as parameter, this contains all data */
-
+		afterOpen:      $.noop,                /* Called after open. Gets event as parameter, this contains all data */
+		afterContent:   $.noop,                /* Called after content is ready and has been set. Gets event as parameter, this contains all data */
+		afterClose:     $.noop,                /* Called after close. Gets event as parameter, this contains all data */
 		onKeyUp:        $.noop,                /* Called on key up for the frontmost featherlight */
 		onResize:       $.noop,                /* Called after new content and when a window is resized */
 		type:           null,                  /* Specify type of lightbox. If unset, it will check for the targetAttrs value. */
@@ -173,12 +157,11 @@
 				css = !self.resetCss ? self.namespace : self.namespace+'-reset', /* by adding -reset to the classname, we reset all the default css */
 				$background = $(self.background || [
 					'<div class="'+css+'-loading '+css+'">',
-						'<button class="'+css+'-close-icon '+ self.namespace + '-close" aria-label="Close">',
-							self.closeIcon,
-						'</button>',
 						'<div class="'+css+'-content">',
+							'<button class="'+css+'-close-icon '+ self.namespace + '-close" aria-label="Close">',
+								self.closeIcon,
+							'</button>',
 							'<div class="'+self.namespace+'-inner">' + self.loading + '</div>',
-							'<span class="custom_loader"><i class="fa fa-spinner"></i></span>',
 						'</div>',
 					'</div>'].join('')),
 				closeButtonSelector = '.'+self.namespace+'-close' + (self.otherClose ? ',' + self.otherClose : '');
@@ -248,7 +231,7 @@
 					return !data;
 				});
 				if(!data) {
-					//if('console' in window){ window.console.error('Featherlight: no content filter found ' + (target ? ' for "' + target + '"' : ' (no target specified)')); }
+					if('console' in window){ window.console.error('Featherlight: no content filter found ' + (target ? ' for "' + target + '"' : ' (no target specified)')); }
 					return false;
 				}
 			}
@@ -497,7 +480,7 @@
 			/* make a copy */
 			config = $.extend({}, config);
 
-			/* Only for openTrigger and namespace... */
+			/* Only for openTrigger, filter & namespace... */
 			var namespace = config.namespace || Klass.defaults.namespace,
 				tempConfig = $.extend({}, Klass.defaults, Klass.readElementConfig($source[0], namespace), config),
 				sharedPersist;
@@ -523,7 +506,7 @@
 
 			$source.on(tempConfig.openTrigger+'.'+tempConfig.namespace, tempConfig.filter, handler);
 
-			return handler;
+			return {filter: tempConfig.filter, handler: handler};
 		},
 
 		current: function() {
@@ -548,8 +531,9 @@
 		_onReady: function() {
 			var Klass = this;
 			if(Klass.autoBind){
+				var $autobound = $(Klass.autoBind);
 				/* Bind existing elements */
-				$(Klass.autoBind).each(function(){
+				$autobound.each(function(){
 					Klass.attach($(this));
 				});
 				/* If a click propagates to the document level, then we have an item that was added later on */
@@ -557,10 +541,18 @@
 					if (evt.isDefaultPrevented()) {
 						return;
 					}
+					var $cur = $(evt.currentTarget);
+					var len = $autobound.length;
+					$autobound = $autobound.add($cur);
+					if(len === $autobound.length) {
+						return; /* already bound */
+					}
 					/* Bind featherlight */
-					var handler = Klass.attach($(evt.currentTarget));
+					var data = Klass.attach($cur);
 					/* Dispatch event directly */
-					handler(evt);
+					if (!data.filter || $(evt.target).parentsUntil($cur, data.filter).length > 0) {
+						data.handler(evt);
+					}
 				});
 			}
 		},
